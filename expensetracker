@@ -1,0 +1,83 @@
+import datetime
+
+class ExpenseTracker:
+    def __init__(self):
+        self.expenses = {}
+
+    def add_expense(self, category, amount, description):
+        timestamp = datetime.datetime.now()
+        date = timestamp.strftime("%Y-%m-%d")
+        if date not in self.expenses:
+            self.expenses[date] = {}
+        if category not in self.expenses[date]:
+            self.expenses[date][category] = []
+        self.expenses[date][category].append({"amount": amount, "description": description})
+
+    def monthly_summary(self):
+        summary = {}
+        for date, categories in self.expenses.items():
+            month = date[:7]
+            if month not in summary:
+                summary[month] = {}
+            for category, expenses in categories.items():
+                if category not in summary[month]:
+                    summary[month][category] = 0
+                for expense in expenses:
+                    summary[month][category] += expense["amount"]
+        return summary
+
+    def category_wise_expenditure(self, month):
+        expenditure = {}
+        for date, categories in self.expenses.items():
+            if date.startswith(month):
+                for category, expenses in categories.items():
+                    if category not in expenditure:
+                        expenditure[category] = 0
+                    for expense in expenses:
+                        expenditure[category] += expense["amount"]
+        return expenditure
+
+def main():
+    tracker = ExpenseTracker()
+
+    while True:
+        print("\nExpense Tracker")
+        print("1. Add Expense")
+        print("2. Monthly Summary")
+        print("3. Category-wise Expenditure")
+        print("4. Exit")
+
+        choice = input("Enter your choice: ")
+
+        if choice == "1":
+            category = input("Enter expense category: ")
+            amount = float(input("Enter expense amount: "))
+            description = input("Enter expense description: ")
+            tracker.add_expense(category, amount, description)
+            print("Expense added successfully!")
+        elif choice == "2":
+            month = input("Enter month (YYYY-MM) to view summary: ")
+            summary = tracker.monthly_summary()
+            if month in summary:
+                print(f"Monthly Summary for {month}:")
+                for category, total in summary[month].items():
+                    print(f"{category}: {total}")
+            else:
+                print("No data available for the specified month.")
+        elif choice == "3":
+            month = input("Enter month (YYYY-MM) to view category-wise expenditure: ")
+            expenditure = tracker.category_wise_expenditure(month)
+            if expenditure:
+                print(f"Category-wise Expenditure for {month}:")
+                for category, total in expenditure.items():
+                    print(f"{category}: {total}")
+            else:
+                print("No data available for the specified month.")
+        elif choice == "4":
+            print("Exiting...")
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+if __name__ == "__main__":
+    main()
